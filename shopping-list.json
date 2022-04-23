@@ -1,0 +1,73 @@
+[
+    {
+        "id": 1,
+        "name": "bread",
+        "category": "bakery",
+        "quantity": 2,
+        "unit": null
+    },
+    {
+        "id": 2,
+        "name": "cheese",
+        "category": "dairy",
+        "quantity": 1,
+        "unit": "kg"
+    },
+    {
+        "id": 3,
+        "name": "water",
+        "category": "drinks",
+        "quantity": 6,
+        "unit": null
+    },
+    {
+        "id": 4,
+        "name": "coffee",
+        "category": "coffe and tea",
+        "quantity": 1,
+        "unit": "kg"
+    },
+    {
+        "id": 5,
+        "name": "tea",
+        "category": "coffe and tea",
+        "quantity": 2,
+        "unit": null
+    },
+    {
+        "id": 6,
+        "name": "milk",
+        "category": "dairy",
+        "quantity": 1,
+        "unit": "liter"
+    },
+    {
+        "id": 7,
+        "name": "tomato",
+        "category": "vegetables",
+        "quantity": 0.5,
+        "unit": "kg"
+    },
+    {
+        "id": 8,
+        "name": "apple",
+        "category": "fruits",
+        "quantity": 0.5,
+        "unit": "kg"
+    },
+    {
+        "id": 9,
+        "name": "schampoo",
+        "category": "cosmetics",
+        "quantity": 1,
+        "unit": null
+    },
+    {
+        "id": 10,
+        "name": "soap",
+        "category": "cosmetics",
+        "quantity": 1,
+        "unit": null
+    }
+
+]
