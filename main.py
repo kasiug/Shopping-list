@@ -1,8 +1,15 @@
 from colorama import Cursor
 from flask import Flask, jsonify, request
+# from flask_cors import CORS
 import sqlite3 as sql
+from database import create
+import os
 
 app = Flask(__name__)
+# cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+if os.stat("database.db").st_size == 0:
+    create()
 
 
 @app.route('/shopping-list', methods=['GET'])
