@@ -1,0 +1,13 @@
+
+body{
+    width: 100%;
+}
+
+h1, .table {
+    margin-top: 20px;
+    margin-left: 80px;
+}
+
+button i {
+    cursor: pointer;
+}

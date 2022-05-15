@@ -1,18 +1,17 @@
-from colorama import Cursor
 from flask import Flask, jsonify, request
-# from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 import sqlite3 as sql
 from database import create
 import os
 
 app = Flask(__name__)
-# cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+CORS(app)
 
 if os.stat("database.db").st_size == 0:
     create()
 
-
 @app.route('/shopping-list', methods=['GET'])
+@cross_origin()
 def shoppingList():
     con = sql.connect("database.db")
     con.row_factory = sql.Row
@@ -22,12 +21,16 @@ def shoppingList():
 
     rows = cur.fetchall()
     data = []
+    columnNames = [column[0] for column in cur.description]
+
     for row in rows:
-        data.append([x for x in row])  # or simply data.append(list(row))
+        data.append(dict(zip(columnNames, row)))  # or simply data.append(list(row))
     return jsonify(data)
 
 
+
 @app.route('/shopping-list/<id>', methods=['GET'])
+@cross_origin()
 def shoppingItem(id):
     con = sql.connect("database.db")
     con.row_factory = sql.Row
@@ -37,12 +40,15 @@ def shoppingItem(id):
 
     rows = cur.fetchall()
     data = []
+    columnNames = [column[0] for column in cur.description]
+
     for row in rows:
-        data.append([x for x in row])  # or simply data.append(list(row))
+        data.append(dict(zip(columnNames, row)))  # or simply data.append(list(row))
     return jsonify(data)
 
 
 @app.route('/shopping-list/<id>', methods=['DELETE'])
+@cross_origin()
 def deleteShoppingItem(id):
     con = sql.connect("database.db")
     con.row_factory = sql.Row
@@ -54,6 +60,7 @@ def deleteShoppingItem(id):
 
 
 @app.route('/shopping-list/add', methods=['POST'])
+@cross_origin()
 def addShoppingItem():
     con = sql.connect("database.db")
     con.row_factory = sql.Row
@@ -73,6 +80,7 @@ def addShoppingItem():
 
 
 @app.route('/shopping-list/<id>', methods=['PUT'])
+@cross_origin()
 def updateShoppingItem(id):
     con = sql.connect("database.db")
     con.row_factory = sql.Row
