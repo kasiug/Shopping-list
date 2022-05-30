@@ -1,6 +1,5 @@
 import sqlite3 as sql
 
-
 def create():
     connection = sql.connect('database.db')
     print("Table created successfully")

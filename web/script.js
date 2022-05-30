@@ -1,30 +1,11 @@
+var shoppingList = [];
+
 $( document ).ready(function() {
-    // $.ajax({
-    //     type: "GET",
-    //     url: "https://covid19.mathdro.id/api/daily",
-    //     dataType: "json",
-    //     success: function (result,) {
-    //         console.log(result)
-
-            
-    //         // var table = $("<table><tr><th>Weather Description</th></tr>");
-
-    //         // table.append("<tr><td>City:</td><td>" + result["name"] + "</td></tr>");
-    //         // table.append("<tr><td>Country:</td><td>" + result["sys"]["country"] + "</td></tr>");
-    //         // table.append("<tr><td>Current Temperature:</td><td>" + result["main"]["temp"] + "°C</td></tr>");
-    //         // table.append("<tr><td>Humidity:</td><td>" + result["main"]["humidity"] + "</td></tr>");
-    //         // table.append("<tr><td>Weather:</td><td>" + result["weather"][0]["description"] + "</td></tr>");
-
-    //         // $("#message").html(table);
-    //     },
-    //     error: function (xhr, status, error) {
-    //         alert("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
-    //     }
-    // });
     $.get( "http://localhost:3000/shopping-list")
-        .done(function( data ) {
+        .done(function(data) {
+        shoppingList = data;
         var index = 0;
-            data.forEach(element => {
+        shoppingList.forEach(element => {
                 $('tbody').append(`
                     <tr id="row-${element.id}">
                         <th scope="row">${++index}</th>
@@ -36,7 +17,7 @@ $( document ).ready(function() {
                             <button ctype="button" class="btn btn-light"data-toggle="modal" data-target="#addModal" data-id="${element.id}">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
-                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal" data-id="${element.id}">
+                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal" data-name="${element.name}" data-id="${element.id}">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </td>
@@ -46,49 +27,72 @@ $( document ).ready(function() {
 });
 
 $('#deleteModal').on('show.bs.modal', function (event) {
-    var button = $(event.relatedTarget) // Button that triggered the modal
-    var recipient = button.data('name') // Extract info from data-* attributes
-    // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-    // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
-    var modal = $(this)
-    modal.find('.modal-title').text('New message to ' + recipient)
-    modal.find('.modal-body input').val(recipient)
+    var button = $(event.relatedTarget);
+    const itemName = button.data('name');
+    const id = button.data('id');
+    var modal = $(this);
 
-    var id = button.data('id');
-    $('#deleteElement').attr('data-value', id);
+    modal.find('.modal-title').text('You want to delete ' + itemName + ' ?');
+    $('#deleteElement').attr('data-id', id);
   })
 
-  $('#deleteElement').on('click', function () {
-        var id = $(this).attr('data-value');
-        $(`#row-${id}`).remove();
+  $('#addModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget)
+    const id = button.data('id');
+    var modal = $(this);
+
+    if(id) {
+        const element = shoppingList.find(x => x.id === id);
+        modal.find('.modal-title').text('Update element ' + element.name);
+        modal.find('button#addElement').text("Update");
+    
+        modal.find('.modal-body input#name').val(element.name);
+        modal.find('.modal-body input#category').val(element.category);
+        modal.find('.modal-body input#quantity').val(element.quantity);
+        modal.find('.modal-body input#unit').val(element.unit);
+    
+        $('#addElement').attr('data-id', id);
+    }
+  });
+
+  $('#addModal').on('hide.bs.modal', function () {
+        var modal = $(this);
+        modal.find('.modal-title').text("Add new shopping item");
+        modal.find('button#addElement').text("Add");
+        modal.find('.modal-body input#name').val("");
+        modal.find('.modal-body input#category').val("");
+        modal.find('.modal-body input#quantity').val("");
+        modal.find('.modal-body input#unit').val("");
     });
 
-  $('#addElement').on('click', function () {
-  
-    // Adding a row inside the tbody.
-    $('tbody').append(`
-        <tr id="row-4">
-            <th scope="row">1</th>
-            <td>Rafal</td>
-            <td>Gozdz</td>
-            <td>@rgozdz</td>
-            <td>
-                <button ctype="button" class="btn btn-light"data-toggle="modal" data-target="#addModal" data-id="1">
-                    <i class="fa-solid fa-pen"></i>
-                </button>
-                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal" data-id="1">
-                    <i class="fa-solid fa-trash"></i>
-                </button>
-            </td>
-        </tr>`);
 
-         // Adding a row inside the tbody.
-    // $('#tbody').append(`<tr id="R${++rowIdx}">
-    // <td class="row-index text-center">
-    //       <p>Row ${rowIdx}</p></td>
-    //  <td class="text-center">
-    //   <button class="btn btn-danger remove" 
-    //       type="button">Remove</button>
-    //   </td>
-    //  </tr>`);
-});
+  $('#shoppingItemForm').on('submit', function (e) {
+    e.preventDefault();
+    var id = $(this).attr('data-id');
+    console.log($('form').serializeArray());
+    $.ajax({
+        type: "PUT",
+        url: `http://localhost:3000/shopping-list/${id}`,
+        data: $('form').serializeArray(),
+        success: function(response) {
+            alert(response['response']);
+        },
+        error: function() {
+            alert('Error');
+        }
+    });
+  });
+
+  $('#deleteElement').on('click', function (e) {
+        var id = $(this).attr('data-id');
+        $.ajax({
+            type: "DELETE",
+            url: `http://localhost:3000/shopping-list/${id}`,
+            success: function () {
+                $(`#row-${id}`).remove();
+            },
+            error: function (xhr, status, error) {
+                alert("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
+            }
+        });
+    });
