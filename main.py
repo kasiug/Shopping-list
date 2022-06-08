@@ -54,10 +54,9 @@ def deleteShoppingItem(id):
     con.row_factory = sql.Row
 
     cur = con.cursor()
-    cur.execute("delete from shopping_list where id=?", id)
+    cur.execute("delete from shopping_list where id=?", (id,))
     con.commit()
-    return id
-
+    return ""
 
 @app.route('/shopping-list/add', methods=['POST'])
 @cross_origin()
@@ -65,7 +64,6 @@ def addShoppingItem():
     con = sql.connect("database.db")
     con.row_factory = sql.Row
 
-    id = request.form['id']
     name = request.form['name']
     category = request.form['category']
     quantity = request.form['quantity']
@@ -74,10 +72,9 @@ def addShoppingItem():
     cursor = con.cursor()
 
     cursor.execute(
-        "insert into shopping_list (id,name,category,quantity,unit) values (?,?,?,?,?)", (id, name, category, quantity, unit))
+        "insert into shopping_list (name,category,quantity,unit) values (?,?,?,?)", (name, category, quantity, unit))
     con.commit()
-    return id
-
+    return str(cursor.lastrowid)
 
 @app.route('/shopping-list/<id>', methods=['PUT'])
 @cross_origin()

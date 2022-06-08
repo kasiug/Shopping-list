@@ -12,7 +12,7 @@ $( document ).ready(function() {
                         <td>${element.name}</td>
                         <td>${element.category}</td>
                         <td>${element.quantity}</td>
-                        <td>${element.unit}</td>
+                        <td>${element.unit ?? ""}</td>
                         <td>
                             <button ctype="button" class="btn btn-light"data-toggle="modal" data-target="#addModal" data-id="${element.id}">
                                 <i class="fa-solid fa-pen"></i>
@@ -65,34 +65,58 @@ $('#deleteModal').on('show.bs.modal', function (event) {
         modal.find('.modal-body input#unit').val("");
     });
 
-
-  $('#shoppingItemForm').on('submit', function (e) {
+  $('#addElement').on('click', function (e) {
     e.preventDefault();
     var id = $(this).attr('data-id');
-    console.log($('form').serializeArray());
+    if(id) {
+        updateShoppingItem(id);
+    } else {
+        addShoppingItem();
+    }
+  });
+
+$('#deleteElement').on('click', function (e) {
+    var id = $(this).attr('data-id');
+    $.ajax({
+        type: "DELETE",
+        url: `http://localhost:3000/shopping-list/${id}`,
+        success: function () {
+            $(`#row-${id}`).remove();
+        },
+        error: function (xhr, status, error) {
+            alert("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
+        }
+    });
+});
+
+function updateShoppingItem(id) {
     $.ajax({
         type: "PUT",
         url: `http://localhost:3000/shopping-list/${id}`,
-        data: $('form').serializeArray(),
-        success: function(response) {
-            alert(response['response']);
-        },
+        data: convertFormToJSON($('form')),
         error: function() {
-            alert('Error');
+            alert(response['response']);
         }
     });
-  });
+}
 
-  $('#deleteElement').on('click', function (e) {
-        var id = $(this).attr('data-id');
-        $.ajax({
-            type: "DELETE",
-            url: `http://localhost:3000/shopping-list/${id}`,
-            success: function () {
-                $(`#row-${id}`).remove();
-            },
-            error: function (xhr, status, error) {
-                alert("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
-            }
-        });
+function addShoppingItem() {
+    $.ajax({
+        type: "POST",
+        url: 'http://localhost:3000/shopping-list/add',
+        type: 'POST',
+        data: convertFormToJSON($('form')),
+        error: function() {
+            alert(response['response']);
+        }
     });
+};
+
+function convertFormToJSON(form) {
+    const array = $(form).serializeArray();
+    const json = {};
+    $.each(array, function () {
+      json[this.name] = this.value || "";
+    });
+    return json;
+}
